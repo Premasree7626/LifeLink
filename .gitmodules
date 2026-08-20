@@ -1,0 +1,9 @@
+[submodule "Web"]
+	path = Web
+	url = https://github.com/Premasree7626/LifeLink_Web.git
+[submodule "Backend"]
+	path = Backend
+	url = https://github.com/Premasree7626/LifeLink_Backend.git
+[submodule "Android"]
+	path = Android
+	url = https://github.com/Premasree7626/LifeLink_Android.git
