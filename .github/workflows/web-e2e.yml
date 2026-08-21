@@ -1,4 +1,4 @@
-name: LifeLink Web Test & Deploy (Parent Copy)
+name: LifeLink Web Test Suite (Parent Copy)
 
 on:
   push:
@@ -11,18 +11,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
-  test-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  test-web:
+    name: LifeLink Web 500 Test Suite
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,26 +45,8 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: https://lifelink-backend-avuk.onrender.com/api
           NEXT_PUBLIC_SOCKET_URL: https://lifelink-backend-avuk.onrender.com
-          PAGES_URL: ${{ steps.deployment.outputs.page_url }}
+          PAGES_URL: https://premasree7626.github.io/LifeLink_Web/
         run: npm run test:lifelink
-
-      - name: Prepare Deployment Directory for GitHub Pages
-        run: |
-          mkdir -p dist/reports/latest
-          mkdir -p dist/reports/history/build-${{ github.run_number }}
-          
-          # Copy complete Next.js static Web application build to dist root
-          cp -r out/* dist/
-          
-          # Copy report files to dist/reports/latest/
-          cp LifeLinkTesting/reports/html/execution-report.html dist/reports/latest/execution-report.html
-          cp LifeLinkTesting/reports/excel/LifeLink_Web_500_Test_Report.xlsx dist/reports/latest/LifeLink_Web_500_Test_Report.xlsx
-          cp LifeLinkTesting/reports/zip/LifeLink_Web_Test_Reports.zip dist/reports/latest/LifeLink_Web_Test_Reports.zip
-          
-          # Copy report files to build history directory
-          cp LifeLinkTesting/reports/html/execution-report.html dist/reports/history/build-${{ github.run_number }}/execution-report.html
-          cp LifeLinkTesting/reports/excel/LifeLink_Web_500_Test_Report.xlsx dist/reports/history/build-${{ github.run_number }}/LifeLink_Web_500_Test_Report.xlsx
-          cp LifeLinkTesting/reports/zip/LifeLink_Web_Test_Reports.zip dist/reports/history/build-${{ github.run_number }}/LifeLink_Web_Test_Reports.zip
 
       - name: Upload Web Test Report Artifacts (Excel, HTML, ZIP)
         uses: actions/upload-artifact@v4
@@ -83,24 +57,10 @@ jobs:
             Web/LifeLinkTesting/reports/html/execution-report.html
             Web/LifeLinkTesting/reports/zip/LifeLink_Web_Test_Reports.zip
 
-      - name: Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        continue-on-error: true
-        with:
-          path: Web/dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
-
       - name: Generate GitHub Step Summary
         if: always()
         run: |
-          PAGES_BASE="${{ steps.deployment.outputs.page_url }}"
-          if [ -z "$PAGES_BASE" ]; then
-            PAGES_BASE="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-          fi
+          PAGES_BASE="https://premasree7626.github.io/LifeLink_Web"
 
           cat << 'EOF' > step_summary.md
           # 🩸 LifeLink Web — 500 Test Execution & Report Summary
